@@ -1,5 +1,4 @@
 import streamlit as st
-import base64
 import pandas as pd
 import ast
 import numpy as np
@@ -13,55 +12,47 @@ from streamlit_folium import st_folium
 # -------------------- CONFIG --------------------
 st.set_page_config(layout="wide")
 
-# -------------------- LOAD IMAGE & CONVERT TO BASE64 --------------------
-def get_base64_image(img_path):
-    with open(img_path, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
-bg_image_base64 = get_base64_image("https://images.unsplash.com/photo-1501117716987-c8bd955fa90c")
-
-# -------------------- HERO SECTION --------------------
+# -------------------- HERO SECTION (Unsplash Background) --------------------
 st.markdown(
-    f"""
+    """
     <style>
-    .hero {{
+    .hero {
         position: relative;
-        background-image: url("data:image/jpeg;base64,{bg_image_base64}");
+        background-image: url("https://images.unsplash.com/photo-1501117716987-c8bd955fa90c");
         background-size: cover;
         background-position: center;
-        height: 90vh;
+        height: 92vh;
         border-radius: 12px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         padding: 60px;
         color: white;
-    }}
-    .hero h1 {{
+    }
+    .hero h1 {
         font-size: 3.2em;
         font-weight: bold;
         margin-bottom: 0.2em;
-    }}
-    .hero h2 {{
+    }
+    .hero h2 {
         font-size: 1.8em;
         color: #e0c07c;
         margin-bottom: 0.5em;
-    }}
-    .hero p {{
+    }
+    .hero p {
         font-size: 1.2em;
         max-width: 700px;
-    }}
-    .hero .stats {{
+    }
+    .hero .stats {
         display: flex;
         gap: 80px;
         margin-top: 40px;
-    }}
-    .hero .stat {{
+    }
+    .hero .stat {
         font-size: 1.5em;
         font-weight: bold;
         text-align: center;
-    }}
+    }
     </style>
     <div class="hero">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Hotel_font_awesome.svg/1024px-Hotel_font_awesome.svg.png" width="60" style="margin-bottom:15px">
@@ -98,7 +89,7 @@ def load_data():
 
 df = load_data()
 
-# -------------------- TAB 2: LISTING HOTEL --------------------
+# -------------------- TAB 2: Listing --------------------
 with tab2:
     st.subheader("Rekomendasi Berdasarkan Mood & Budget")
     questions = {
