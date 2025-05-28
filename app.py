@@ -9,73 +9,9 @@ import folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import st_folium
 
-# -------------------- CONFIG --------------------
 st.set_page_config(layout="wide")
 
-# -------------------- HERO SECTION (Unsplash Background) --------------------
-st.markdown(
-    """
-    <style>
-    .hero {
-        position: relative;
-        background-image: url("https://images.unsplash.com/photo-1501117716987-c8bd955fa90c");
-        background-size: cover;
-        background-position: center;
-        height: 92vh;
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 60px;
-        color: white;
-    }
-    .hero h1 {
-        font-size: 3.2em;
-        font-weight: bold;
-        margin-bottom: 0.2em;
-    }
-    .hero h2 {
-        font-size: 1.8em;
-        color: #e0c07c;
-        margin-bottom: 0.5em;
-    }
-    .hero p {
-        font-size: 1.2em;
-        max-width: 700px;
-    }
-    .hero .stats {
-        display: flex;
-        gap: 80px;
-        margin-top: 40px;
-    }
-    .hero .stat {
-        font-size: 1.5em;
-        font-weight: bold;
-        text-align: center;
-    }
-    </style>
-    <div class="hero">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Hotel_font_awesome.svg/1024px-Hotel_font_awesome.svg.png" width="60" style="margin-bottom:15px">
-        <h1>Hidup Nyaman & Elegan<br>di Jantung Kota Indonesia</h1>
-        <h2>HotelHunt Smart Stay</h2>
-        <p>
-            Temukan hotel terbaik yang cocok dengan mood kamu — dari healing, adventure, sampai me-time. 
-            Rekomendasi berdasarkan lokasi, fasilitas, dan kebutuhan emosionalmu. Coba sekarang!
-        </p>
-        <div class="stats">
-            <div class="stat">50+<br>Destinasi</div>
-            <div class="stat">#1<br>Rekomendasi Emosional</div>
-            <div class="stat">500+<br>Hotel Terdaftar</div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# -------------------- TABS --------------------
-tab1, tab2, tab3 = st.tabs(["🏠 Beranda", "📋 Listing Hotel", "🗺️ Peta & Fasilitas"])
-
-# -------------------- LOAD DATA --------------------
+# --------- LOAD DATA ----------
 @st.cache_data
 def load_data():
     df = pd.read_csv("indonesia_hotels.csv")
@@ -89,9 +25,24 @@ def load_data():
 
 df = load_data()
 
-# -------------------- TAB 2: Listing --------------------
+# --------- TABS ---------
+tab1, tab2, tab3 = st.tabs(["🏠 Beranda", "📋 Listing Hotel", "🗺️ Peta & Fasilitas"])
+
+# --------- TAB 1: BERANDA ---------
+with tab1:
+    st.title("🏨 HOTEL HUNT")
+    st.markdown("""
+        ### Hidup Nyaman & Elegan di Jantung Kota Indonesia  
+        **HotelHunt Smart Stay**  
+        Temukan hotel terbaik sesuai mood kamu — dari healing, adventure, sampai me-time.  
+        Rekomendasi berdasarkan lokasi, fasilitas, dan kebutuhan emosionalmu.  
+        """)
+    st.markdown("---")
+    st.markdown("📍 500+ Hotel | 🌍 50+ Destinasi | 💡 Rekomendasi berbasis AI")
+
+# --------- TAB 2: LISTING ---------
 with tab2:
-    st.subheader("Rekomendasi Berdasarkan Mood & Budget")
+    st.header("Cari Hotel Berdasarkan Mood & Budget")
     questions = {
         "Apa yang kamu rasakan saat ini?": ["senang", "cemas", "sedih"],
         "Kalau bisa memilih aktivitas sekarang, kamu ingin:": ["tidur", "menyendiri", "pacaran", "jalan-jalan"]
@@ -153,7 +104,7 @@ with tab2:
         top = filtered.sort_values(by='score', ascending=False).head(5)
         st.dataframe(top[['Hotel Name', 'City', 'Min', 'Max', 'score']])
 
-# -------------------- TAB 3: PETA --------------------
+# --------- TAB 3: PETA & FASILITAS ---------
 def content_based_recommendation(df, hotel_name, top_n=5):
     mlb = MultiLabelBinarizer()
     enc = mlb.fit_transform(df['list_fasilitas'].apply(lambda x: [f.lower() for f in x]))
@@ -164,7 +115,7 @@ def content_based_recommendation(df, hotel_name, top_n=5):
     return df.iloc[top_ids]
 
 with tab3:
-    st.subheader("🗺️ Klik Hotel di Peta untuk Lihat Detail & Rekomendasi")
+    st.header("Peta Hotel & Rekomendasi Serupa")
     m = folium.Map(location=[-2.5, 117.5], zoom_start=5)
     marker_cluster = MarkerCluster().add_to(m)
     for _, row in df.iterrows():
