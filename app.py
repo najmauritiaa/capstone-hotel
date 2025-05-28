@@ -1,48 +1,93 @@
 import streamlit as st
+import base64
 import pandas as pd
 import ast
+import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
 from sklearn.feature_extraction.text import CountVectorizer
-import numpy as np
 import folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import st_folium
 
-# ---------------------- CSS: Background Area Tab -----------------------
-st.markdown(
-    """
-    <style>
-    .tab-content {
-        background-image: url('https://images.unsplash.com/photo-1501117716987-c8bd955fa90c');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        padding: 20px;
-        border-radius: 12px;
-        color: black;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# -------------------- CONFIG --------------------
+st.set_page_config(layout="wide")
 
-# ---------------------- JUDUL -----------------------
+# -------------------- LOAD IMAGE & CONVERT TO BASE64 --------------------
+def get_base64_image(img_path):
+    with open(img_path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+bg_image_base64 = get_base64_image("https://images.unsplash.com/photo-1501117716987-c8bd955fa90c")
+
+# -------------------- HERO SECTION --------------------
 st.markdown(
-    """
-    <div style="background-color:#e0f7fa;padding:10px 20px;border-radius:8px">
-        <h1 style="color:#006064;">🏨 HOTEL HUNT</h1>
+    f"""
+    <style>
+    .hero {{
+        position: relative;
+        background-image: url("data:image/jpeg;base64,{bg_image_base64}");
+        background-size: cover;
+        background-position: center;
+        height: 90vh;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 60px;
+        color: white;
+    }}
+    .hero h1 {{
+        font-size: 3.2em;
+        font-weight: bold;
+        margin-bottom: 0.2em;
+    }}
+    .hero h2 {{
+        font-size: 1.8em;
+        color: #e0c07c;
+        margin-bottom: 0.5em;
+    }}
+    .hero p {{
+        font-size: 1.2em;
+        max-width: 700px;
+    }}
+    .hero .stats {{
+        display: flex;
+        gap: 80px;
+        margin-top: 40px;
+    }}
+    .hero .stat {{
+        font-size: 1.5em;
+        font-weight: bold;
+        text-align: center;
+    }}
+    </style>
+    <div class="hero">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Hotel_font_awesome.svg/1024px-Hotel_font_awesome.svg.png" width="60" style="margin-bottom:15px">
+        <h1>Hidup Nyaman & Elegan<br>di Jantung Kota Indonesia</h1>
+        <h2>HotelHunt Smart Stay</h2>
+        <p>
+            Temukan hotel terbaik yang cocok dengan mood kamu — dari healing, adventure, sampai me-time. 
+            Rekomendasi berdasarkan lokasi, fasilitas, dan kebutuhan emosionalmu. Coba sekarang!
+        </p>
+        <div class="stats">
+            <div class="stat">50+<br>Destinasi</div>
+            <div class="stat">#1<br>Rekomendasi Emosional</div>
+            <div class="stat">500+<br>Hotel Terdaftar</div>
+        </div>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-tab1, tab2, tab3 = st.tabs(["🏠", "Cari Berdasarkan Mood & Budget", "Cari Berdasarkan Peta"])
+# -------------------- TABS --------------------
+tab1, tab2, tab3 = st.tabs(["🏠 Beranda", "📋 Listing Hotel", "🗺️ Peta & Fasilitas"])
 
-# ---------------------- DATASET -----------------------
+# -------------------- LOAD DATA --------------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv('indonesia_hotels.csv')
+    df = pd.read_csv("indonesia_hotels.csv")
     df = df.dropna()
     df[['Min', 'Max']] = df.apply(
         lambda row: pd.Series([row['Max'], row['Min']]) if row['Min'] > row['Max'] else pd.Series([row['Min'], row['Max']]),
@@ -53,25 +98,14 @@ def load_data():
 
 df = load_data()
 
-# ---------------------- TAB 1 -----------------------
-with tab1:
-    st.markdown('<div class="tab-content">', unsafe_allow_html=True)
-    st.header("Selamat Datang di Hotel Hunt! 🏨✨")
-    st.write("""
-        Temukan hotel impianmu dengan mudah dan cepat!  
-        Sesuaikan pencarian berdasarkan suasana hati, anggaran, dan lokasi favoritmu.  
-        Mari mulai petualangan mencari penginapan terbaik yang pas untuk kamu!
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ---------------------- TAB 2 -----------------------
+# -------------------- TAB 2: LISTING HOTEL --------------------
 with tab2:
-    st.markdown('<div class="tab-content">', unsafe_allow_html=True)
-
-    st.subheader("Langkah 1: Jawab pertanyaan berikut ini")
-    questions = [
-        "Apa yang kamu rasakan saat ini?",
-        "Apakah kamu merasa kesepian hari ini?",
+    st.subheader("Rekomendasi Berdasarkan Mood & Budget")
+    questions = {
+        "Apa yang kamu rasakan saat ini?": ["senang", "cemas", "sedih"],
+        "Kalau bisa memilih aktivitas sekarang, kamu ingin:": ["tidur", "menyendiri", "pacaran", "jalan-jalan"]
+    }
+    others = [
         "Apakah kamu merasa stres atau kewalahan akhir-akhir ini?",
         "Apakah kamu ingin berbicara dengan seseorang saat ini?",
         "Apakah kamu merasa bosan dengan rutinitasmu?",
@@ -83,105 +117,68 @@ with tab2:
         "Apakah kamu merasa senang ketika dikelilingi banyak orang?",
         "Apakah kamu ingin merasakan adrenalin atau sesuatu yang memacu semangat?",
         "Apakah kamu merasa butuh memahami dirimu lebih dalam?",
-        "Apakah kamu merasa kurang terhubung dengan orang-orang terdekat?",
-        "Kalau bisa memilih aktivitas sekarang, kamu ingin:"
+        "Apakah kamu merasa kurang terhubung dengan orang-orang terdekat?"
     ]
 
-    answer_options = {
-        "Apa yang kamu rasakan saat ini?": ["senang", "cemas", "sedih"],
-        "Kalau bisa memilih aktivitas sekarang, kamu ingin:": ["tidur", "menyendiri", "pacaran", "jalan-jalan"]
-    }
-
     answers = {}
-    for q in questions:
-        opts = answer_options.get(q, ["ya", "tidak"])
+    for q, opts in questions.items():
         answers[q] = st.selectbox(q, opts)
+    for q in others:
+        answers[q] = st.selectbox(q, ["ya", "tidak"])
 
-    st.subheader("Langkah 2: Masukkan Budget")
     budget_min = st.number_input("Budget Minimum (Rp)", min_value=0, value=300000, step=50000)
     budget_max = st.number_input("Budget Maksimum (Rp)", min_value=0, value=800000, step=50000)
 
-    if st.button("🎯 Cari Rekomendasi Hotel"):
+    if st.button("🎯 Cari Hotel"):
         rules = {
             "Meditation": [("Apa yang kamu rasakan saat ini?", ["cemas", "sedih"]),
-                           ("Apakah kamu merasa stres atau kewalahan akhir-akhir ini?", ["ya"]),
-                           ("Apakah kamu merasa tubuhmu lelah atau tidak bersemangat?", ["ya"]),
-                           ("Apakah kamu merasa butuh memahami dirimu lebih dalam?", ["ya"])],
+                           ("Apakah kamu merasa stres atau kewalahan akhir-akhir ini?", ["ya"])],
             "Me-time": [("Apakah kamu ingin menyendiri dan menjauh dari keramaian?", ["ya"]),
                         ("Kalau bisa memilih aktivitas sekarang, kamu ingin:", ["menyendiri", "tidur"])],
-            "Socialized": [("Apakah kamu merasa kesepian hari ini?", ["ya"]),
-                           ("Apakah kamu ingin berbicara dengan seseorang saat ini?", ["ya"]),
+            "Socialized": [("Apakah kamu ingin berbicara dengan seseorang saat ini?", ["ya"]),
                            ("Apakah kamu merasa senang ketika dikelilingi banyak orang?", ["ya"])],
             "Date": [("Apakah kamu sedang merindukan seseorang secara romantis?", ["ya"]),
                      ("Kalau bisa memilih aktivitas sekarang, kamu ingin:", ["pacaran"])],
             "Adventure": [("Apakah kamu merasa bosan dengan rutinitasmu?", ["ya"]),
-                          ("Apakah kamu ingin mencoba hal baru hari ini?", ["ya"]),
-                          ("Apakah kamu ingin merasakan adrenalin atau sesuatu yang memacu semangat?", ["ya"]),
-                          ("Kalau bisa memilih aktivitas sekarang, kamu ingin:", ["jalan-jalan"])],
-            "Support": [("Apakah kamu merasa kurang terhubung dengan orang-orang terdekat?", ["ya"]),
-                        ("Apakah kamu merasa dihargai oleh orang-orang di sekitarmu?", ["tidak"])]
+                          ("Apakah kamu ingin merasakan adrenalin atau sesuatu yang memacu semangat?", ["ya"])],
         }
 
-        scores = {need: sum(answers[q] in vals for q, vals in conds) for need, conds in rules.items()}
-        dominant_need = max(scores, key=scores.get)
-        st.success(f"✅ Kebutuhan Emosionalmu Saat Ini: {dominant_need}")
+        scores = {need: sum(answers[q] in a for q, a in conds) for need, conds in rules.items()}
+        mood = max(scores, key=scores.get)
+        st.success(f"Mood Terdeteksi: {mood}")
 
-        need_to_facilities = {
-            "Meditation": ['spa', 'pijat', 'yoga', 'perpustakaan', 'taman', 'gazebo', 'atmosfer tenang'],
-            "Adventure": ['bersepeda', 'mendaki', 'memancing', 'kayak', 'menyelam', 'snorkeling', 'berkuda'],
-            "Date": ['bar', 'private', 'romantis', 'restoran', 'teras', 'laut'],
-            "Socialized": ['klub', 'karaoke', 'bar', 'game', 'anak', 'umum'],
-            "Me-time": ['perpustakaan', 'spa', 'yoga', 'tv', 'teras', 'tenang'],
-            "Support": ['layanan', 'resepsionis', 'laundry', 'keamanan', 'apotek', 'pelayanan']
-        }
+        keywords = {
+            "Meditation": ['spa', 'yoga', 'tenang'],
+            "Me-time": ['perpustakaan', 'tv', 'teras'],
+            "Socialized": ['bar', 'karaoke'],
+            "Date": ['romantis', 'laut', 'private'],
+            "Adventure": ['hiking', 'menyelam', 'bersepeda']
+        }.get(mood, [])
 
-        needed_keywords = need_to_facilities.get(dominant_need, [])
-        def count_matching(facilities): return sum(any(kw in f.lower() for f in facilities) for kw in needed_keywords)
+        def match_score(fasilitas): return sum(any(k in f.lower() for f in fasilitas) for k in keywords)
 
         filtered = df[(df['Min'] >= budget_min) & (df['Max'] <= budget_max)].copy()
-        if filtered.empty:
-            filtered = df.copy()
-            st.warning("Menampilkan semua hotel karena tidak ada yang sesuai budget.")
-        filtered['matching_score'] = filtered['list_fasilitas'].apply(count_matching)
-        top_5 = filtered.sort_values(by='matching_score', ascending=False).head(5)
-        st.dataframe(top_5[['Hotel Name', 'City', 'Min', 'Max', 'matching_score']])
+        filtered['score'] = filtered['list_fasilitas'].apply(match_score)
+        top = filtered.sort_values(by='score', ascending=False).head(5)
+        st.dataframe(top[['Hotel Name', 'City', 'Min', 'Max', 'score']])
 
-        # Content-based filtering
-        df['fasilitas_str'] = df['list_fasilitas'].apply(lambda x: ' '.join(x))
-        vectorizer = CountVectorizer().fit_transform(df['fasilitas_str'])
-        sim_fac = cosine_similarity(vectorizer)
-        df['avg_price'] = (df['Min'] + df['Max']) / 2
-        norm_price = MinMaxScaler().fit_transform(df[['avg_price']])
-        sim_price = 1 - np.abs(norm_price - norm_price.T)
-        sim_comb = 0.7 * sim_fac + 0.3 * sim_price
-        sim_scores = np.mean(sim_comb[top_5.index], axis=0)
-        idx_sorted = np.argsort(sim_scores)[::-1]
-        idx_top10 = [i for i in idx_sorted if i not in top_5.index][:10]
-        top_cb = df.iloc[idx_top10].copy()
-        top_cb['similarity_score'] = sim_scores[idx_top10]
-        st.subheader("🔁 Rekomendasi Hotel Serupa (Content-Based)")
-        st.dataframe(top_cb[['Hotel Name', 'City', 'Min', 'Max', 'similarity_score']])
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ---------------------- TAB 3 -----------------------
+# -------------------- TAB 3: PETA --------------------
 def content_based_recommendation(df, hotel_name, top_n=5):
     mlb = MultiLabelBinarizer()
-    encoded = mlb.fit_transform(df['list_fasilitas'].apply(lambda x: [f.lower() for f in x]))
-    sim = cosine_similarity(encoded)
+    enc = mlb.fit_transform(df['list_fasilitas'].apply(lambda x: [f.lower() for f in x]))
+    sim = cosine_similarity(enc)
     idx = df.index[df['Hotel Name'] == hotel_name][0]
     scores = sorted(list(enumerate(sim[idx])), key=lambda x: x[1], reverse=True)
-    indices = [i[0] for i in scores if i[0] != idx][:top_n]
-    return df.iloc[indices]
+    top_ids = [i for i, _ in scores if i != idx][:top_n]
+    return df.iloc[top_ids]
 
 with tab3:
-    st.markdown('<div class="tab-content">', unsafe_allow_html=True)
-    st.write("Silakan pilih hotel pada peta untuk melihat detail dan rekomendasi.")
+    st.subheader("🗺️ Klik Hotel di Peta untuk Lihat Detail & Rekomendasi")
     m = folium.Map(location=[-2.5, 117.5], zoom_start=5)
     marker_cluster = MarkerCluster().add_to(m)
     for _, row in df.iterrows():
         if row['Hotel Rating'] != 'Belum ada rating':
-            popup = f"""
+            html = f"""
             <div style='width:200px'>
                 <b>{row['Hotel Name']}</b><br>
                 Rating: {row['Hotel Rating']}<br>
@@ -193,29 +190,24 @@ with tab3:
                 popup=row['Hotel Name'],
                 icon=folium.Icon(color='blue')
             ).add_to(marker_cluster)
+
     map_data = st_folium(m, width=800, height=500)
 
     if map_data and map_data.get("last_object_clicked_popup"):
-        name = map_data["last_object_clicked_popup"]
-        selected = df[df['Hotel Name'] == name].iloc[0]
-        st.success(f"🏨 Hotel dipilih: *{name}*")
-        if pd.notna(selected['Hotel Image']):
-            st.image(selected['Hotel Image'], width=400)
-        st.markdown(f"**Nama:** {selected['Hotel Name']}")
-        st.markdown(f"**Lokasi:** {selected['City']}, {selected['Provinsi']}")
-        st.markdown(f"**Rating:** {selected['Hotel Rating']}")
-        st.markdown(f"**Harga:** Rp {int(selected['Min'])} - Rp {int(selected['Max'])}")
-        st.markdown(f"**Fasilitas:** {', '.join(selected['list_fasilitas'])}")
-        st.subheader("🔁 Rekomendasi Serupa")
-        rekom = content_based_recommendation(df, name)
-        for _, row in rekom.iterrows():
-            st.markdown(f"### 🏨 {row['Hotel Name']}")
-            if pd.notna(row['Hotel Image']):
-                st.image(row['Hotel Image'], width=400)
-            st.write(f"📍 {row['City']} - {row['Provinsi']}")
-            st.write(f"💰 Rp {int(row['Min'])} - Rp {int(row['Max'])}")
-            st.write(f"⭐ Rating: {row['Hotel Rating']}")
-            st.write("Fasilitas:", ", ".join(row['list_fasilitas']))
+        selected = map_data["last_object_clicked_popup"]
+        data = df[df['Hotel Name'] == selected].iloc[0]
+        st.success(f"Hotel dipilih: {selected}")
+        if pd.notna(data['Hotel Image']):
+            st.image(data['Hotel Image'], width=400)
+        st.write(f"📍 {data['City']} - {data['Provinsi']}")
+        st.write(f"💰 Rp {int(data['Min'])} - Rp {int(data['Max'])}")
+        st.write(f"⭐ {data['Hotel Rating']}")
+        st.write("Fasilitas:", ", ".join(data['list_fasilitas']))
+        st.subheader("Hotel Serupa:")
+        for _, rec in content_based_recommendation(df, selected).iterrows():
+            st.markdown(f"### 🏨 {rec['Hotel Name']}")
+            if pd.notna(rec['Hotel Image']):
+                st.image(rec['Hotel Image'], width=400)
+            st.write(f"{rec['City']} | Rp {int(rec['Min'])}-{int(rec['Max'])} | ⭐ {rec['Hotel Rating']}")
+            st.write(", ".join(rec['list_fasilitas']))
             st.markdown("---")
-
-    st.markdown('</div>', unsafe_allow_html=True)
