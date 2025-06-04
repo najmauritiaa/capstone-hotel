@@ -143,8 +143,8 @@ with tab1:
     unsafe_allow_html=True
     )
     def image_to_base64(img_path):
-    with open(img_path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+        with open(img_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
 
     # Data kartu
     cards = [
