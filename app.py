@@ -18,11 +18,6 @@ import base64
 with open("header.jpg", "rb") as image_file:
     encoded_image = base64.b64encode(image_file.read()).decode()
 
-st.markdown(
-    f"<img src='data:image/jpeg;base64,{encoded_image}' width='100%'/>",
-    unsafe_allow_html=True
-)
-
 
 tab1, tab2, tab3, tab4 = st.tabs(["Beranda", "Cari Berdasarkan Mood & Budget", "Cari Berdasarkan Peta", "Tentang Kami"])
 with tab1:
