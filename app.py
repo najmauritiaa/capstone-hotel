@@ -16,7 +16,7 @@ import base64
 
 # === Gambar lokal (misal: 'drone/DJI_0330.JPG') ===
 with open(" header.jpg", "rb") as image_file:
-    encoded_image = base64.b64encode(image_file.read()).decode()
+     header_bytes = image_file.read()
 
 
 tab1, tab2, tab3, tab4 = st.tabs(["Beranda", "Cari Berdasarkan Mood & Budget", "Cari Berdasarkan Peta", "Tentang Kami"])
