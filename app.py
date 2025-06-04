@@ -133,84 +133,31 @@ with tab1:
             return base64.b64encode(f.read()).decode()
 
     # Data kartu
-    cards = [
-        {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": " assets/me_time.jpg"},
-        {"title": "Sociolized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": " assets/date.jpg"},
-        {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": " assets/me_time.jpg"},
-        {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": " assets/adventure.jpg"},
-        {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": " assets/date.jpg"},
-        {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": " assets/sport.jpg"},
-    ]
+    import streamlit as st
 
-    # CSS styling
-    st.markdown("""
-        <style>
-            .card-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                margin-top: 20px;
-                justify content: center;
-            }
-            .card {
-                width: 250px;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                overflow: hidden;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                background-color: white;
-                transition: transform 0.2s;
-            }
-            .card:hover {
-                transform: scale(1.02);
-            }
-            .card img {
-                width: 100%;
-                height: 350px;
-                object-fit: cover;
-            }
-            .card-content {
-                padding: 15px;
-            }
-            .card-title {
-                font-weight: bold;
-                font-size: 18px;
-                margin-bottom: 10px;
-            }
-            .card-description {
-                font-size: 14px;
-                color: #444;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+# Data kartu
+cards = [
+    {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": "assets/me_time.jpg"},
+    {"title": "Sociolized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": "assets/date.jpg"},
+    {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": "assets/me_time.jpg"},
+    {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": "assets/adventure.jpg"},
+    {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": "assets/date.jpg"},
+    {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": "assets/sport.jpg"},
+]
 
-    # Render cards
-    card_html = '<div class="card-row">'
+# Tampilkan 3 kartu per baris
+cols_per_row = 3
 
-    for card in cards:
-        try:
-            img_base64 = image_to_base64(card["image"])
-            card_html += f"""
-                <div class="card">
-                    <img src="data:image/jpeg;base64,{img_base64}" alt="{card['title']}">
-                    <div class="card-content">
-                        <div class="card-title">{card['title']}</div>
-                        <div class="card-description">{card['description']}</div>
-                    </div>
-                </div>
-            """
-        except FileNotFoundError:
-            card_html += f"""
-                <div class="card">
-                    <div class="card-content">
-                        <div class="card-title">{card['title']}</div>
-                        <div class="card-description">❌ Gambar '{card['image']}' tidak ditemukan.</div>
-                    </div>
-                </div>
-            """
+for i in range(0, len(cards), cols_per_row):
+    cols = st.columns(cols_per_row)
+    for j in range(cols_per_row):
+        if i + j < len(cards):
+            card = cards[i + j]
+            with cols[j]:
+                st.image(card["image"], use_column_width=True)
+                st.markdown(f"### {card['title']}")
+                st.markdown(card["description"])
 
-    card_html += '</div>'
-    st.markdown(card_html, unsafe_allow_html=True)
 
 with tab2:
     st.write("Silahkan ikuti langkah-langkah di bawah ini untuk menemukan hotel terbaik!")
