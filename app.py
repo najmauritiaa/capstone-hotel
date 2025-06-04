@@ -144,7 +144,8 @@ with tab1:
     )
    def image_to_base64(img_path):
     if not os.path.exists(img_path):
-        raise FileNotFoundError(f"Gambar '{img_path}' tidak ditemukan.")
+        print(f"❌ File tidak ditemukan: {img_path}")
+        return ""
     with open(img_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
