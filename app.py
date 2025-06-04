@@ -142,9 +142,11 @@ with tab1:
     """,
     unsafe_allow_html=True
     )
-   def image_to_base64("assets/header.jpg"):
-        with open("assets/header.jpg", "rb") as f:
-            return base64.b64encode(f.read()).decode() 
+   def image_to_base64(img_path):
+    if not os.path.exists(img_path):
+        raise FileNotFoundError(f"Gambar '{img_path}' tidak ditemukan.")
+    with open(img_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
     # Data kartu
     cards = [
