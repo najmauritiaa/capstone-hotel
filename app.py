@@ -142,12 +142,6 @@ with tab1:
     """,
     unsafe_allow_html=True
     )
-   def image_to_base64(img_path):
-    if not os.path.exists(img_path):
-        print(f"❌ File tidak ditemukan: {img_path}")
-        return ""
-    with open(img_path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
 
     # Data kartu
     cards = [
