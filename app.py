@@ -15,7 +15,7 @@ import base64
 
 
 # === Gambar lokal (misal: 'drone/DJI_0330.JPG') ===
-with open("header.jpg", "rb") as image_file:
+with open("assets/header.jpg", "rb") as image_file:
     encoded_image = base64.b64encode(image_file.read()).decode()
 
 
@@ -134,12 +134,12 @@ with tab1:
 
     # Data kartu
     cards = [
-        {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": " me_time.jpg"},
-        {"title": "Sociolized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": " date.jpg"},
-        {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": " me_time.jpg"},
-        {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": " adventure.jpg"},
-        {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": " date.jpg"},
-        {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": " sport.jpg"},
+        {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": " assets/me_time.jpg"},
+        {"title": "Sociolized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": " assets/date.jpg"},
+        {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": " assets/me_time.jpg"},
+        {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": " assets/adventure.jpg"},
+        {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": " assets/date.jpg"},
+        {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": " assets/sport.jpg"},
     ]
 
     # CSS styling
