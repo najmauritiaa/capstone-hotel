@@ -143,7 +143,8 @@ with tab1:
     unsafe_allow_html=True
     )
     def image_to_base64(img_path):
-    import base64, os
+    import base64
+    import os
     if not os.path.exists(img_path):
         print(f"❌ File tidak ditemukan: {img_path}")
         return ""
