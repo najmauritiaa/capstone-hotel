@@ -143,8 +143,12 @@ with tab1:
     unsafe_allow_html=True
     )
     def image_to_base64(img_path):
-        with open(img_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+    import base64, os
+    if not os.path.exists(img_path):
+        print(f"❌ File tidak ditemukan: {img_path}")
+        return ""
+    with open(img_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
     # Data kartu
     cards = [
@@ -530,8 +534,8 @@ with tab4:
         </div>
     </div>
     """.format(
-        image_to_base64(" -2.jpg"),
-        image_to_base64(" -2.jpg")
+        image_to_base64("assets/me_time.jpg"),
+        image_to_base64("assets/me_time.jpg")
     ), unsafe_allow_html=True)
 
     # Garis pembatas dan pesan penutup
