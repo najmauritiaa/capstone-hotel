@@ -9,10 +9,20 @@ from streamlit_folium import st_folium
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
+import plotly.express as px
 st.set_page_config(layout="wide")
 import base64
+import textwrap
 
+# ---------------------- LOAD DATA -----------------------
+@st.cache_data
+def load_data():
+    df = pd.read_csv('indonesia_hotels.csv')
+    df = df.dropna()
+    df['list_fasilitas'] = df['list_fasilitas'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+    return df
 
+df = load_data()
 
 # === Gambar lokal (misal: 'drone/DJI_0330.JPG') ===
 with open("assets/header.jpg", "rb") as image_file:
@@ -23,13 +33,22 @@ tab1, tab2, tab3, tab4 = st.tabs(["Beranda", "Cari Berdasarkan Mood & Budget", "
 with tab1:
     st.markdown(f"""
 <style>
+.hero-container {{
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 450px;
+    margin: 0 auto;
+    border-radius: 30px;
+    overflow: hidden;
+}}
 .hero-background {{
     width: 100%;
-    height: 782px;
+    height: 100%;
     object-fit: cover;
     border-radius: 30px;
+    display: block;
 }}
-
 .overlay {{
     position: absolute;
     top: 0;
@@ -37,9 +56,9 @@ with tab1:
     right: 0;
     bottom: 0;
     background-color: rgba(0,0,0,0.6);
-    border-radius: 35px;
+    border-radius: 30px;
+    z-index: 1;
 }}
-
 .hero-content {{
     position: absolute;
     top: 0;
@@ -53,41 +72,35 @@ with tab1:
     text-align: center;
     color: white;
     padding: 0 20px;
+    z-index: 2;
 }}
-
 .hero-content h1 {{
     font-size: 3rem;
     font-weight: bold;
     white-space: pre-line;
 }}
-
 .hero-content h2 {{
     font-size: 2rem;
     color: #BDB395;
     font-weight: 600;
 }}
-
 .hero-content p {{
     font-size: 1.1rem;
     max-width: 700px;
     margin-top: 10px;
 }}
-
 .stats {{
     display: flex;
     gap: 50px;
     margin-top: 30px;
 }}
-
 .stat {{
     text-align: center;
 }}
-
 .stat-value {{
     font-size: 1.8rem;
     font-weight: bold;
 }}
-
 .stat-label {{
     font-size: 0.9rem;
 }}
@@ -120,10 +133,11 @@ with tab1:
     # Layout tambahan di bawah
     # Fungsi untuk encode gambar lokal menjadi base64
     # Tampilkan judul utama
+    st.write("---")
     st.markdown(
     """
     <div style='text-align: center; margin-top: 30px;'>
-        <p style='font-size: 24px; font-weight: bold;'>Sesuaikan Pilihan Hotel Dengan Mood Kamu</p>
+        <p style='font-size: 24px; font-weight: bold;'>Sesuaikan Pilihan Hotel Dengan Suasana Hati Kamu</p>
     </div>
     """,
     unsafe_allow_html=True
@@ -133,32 +147,109 @@ with tab1:
             return base64.b64encode(f.read()).decode()
 
     # Data kartu
-    import streamlit as st
+    cards = [
+        {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": "assets/me_time.jpg"},
+        {"title": "Sociolized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": "assets/date.jpg"},
+        {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": "assets/me_time.jpg"},
+        {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": "assets/adventure.jpg"},
+        {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": "assets/date.jpg"},
+        {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": "assets/sport.jpg"},
+    ]
 
-# Data kartu
-cards = [
-    {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": "assets/me_time.jpg"},
-    {"title": "Sociolized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": "assets/date.jpg"},
-    {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": "assets/me_time.jpg"},
-    {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": "assets/adventure.jpg"},
-    {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": "assets/date.jpg"},
-    {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": "assets/sport.jpg"},
-]
+    # CSS styling
+    st.markdown("""
+        <style>
+            .card-row-scroll {
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+                margin-top: 20px;
+                overflow-x: auto;
+                padding-bottom: 20px;
+                scrollbar-width: thin;
+            }
+            .card {
+                flex: 0 0 auto;
+                width: 250px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                background-color: white;
+                transition: transform 0.2s;
+            }
+            .card:hover {
+                transform: scale(1.02);
+            }
+            .card img {
+                width: 100%;
+                height: 250px;
+                object-fit: cover;
+            }
+            .card-content {
+                padding: 15px;
+            }
+            .card-title {
+                font-weight: bold;
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            .card-description {
+                font-size: 14px;
+                color: #444;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-# Tampilkan 3 kartu per baris
-cols_per_row = 3
+    # Render cards: 1 baris horizontal scroll
+    card_html = '<div class="card-row-scroll">'
+    for card in cards:
+        try:
+            img_base64 = image_to_base64(card["image"])
+            card_html += (
+                f'<div class="card">'
+                f'<img src="data:image/jpeg;base64,{img_base64}" alt="{card["title"]}">'
+                f'<div class="card-content">'
+                f'<div class="card-title">{card["title"]}</div>'
+                f'<div class="card-description">{card["description"]}</div>'
+                f'</div>'
+                f'</div>'
+            )
+        except FileNotFoundError:
+            card_html += (
+                f'<div class="card">'
+                f'<div class="card-content">'
+                f'<div class="card-title">{card["title"]}</div>'
+                f'<div class="card-description">❌ Gambar \'{card["image"]}\' tidak ditemukan.</div>'
+                f'</div>'
+                f'</div>'
+            )
+    card_html += '</div>'
+    st.markdown(card_html, unsafe_allow_html=True)
+    st.write("---")
+    st.markdown(
+    """
+    <div style='text-align: center; margin-top: 30px;'>
+        <p style='font-size: 24px; font-weight: bold;'>Sesuaikan Pilihan Hotel Dengan Lokasi Impianmu!</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
 
-for i in range(0, len(cards), cols_per_row):
-    cols = st.columns(cols_per_row)
-    for j in range(cols_per_row):
-        if i + j < len(cards):
-            card = cards[i + j]
-            with cols[j]:
-                st.image(card["image"], use_column_width=True)
-                st.markdown(f"### {card['title']}")
-                st.markdown(card["description"])
+    # PIE CHART JUMLAH HOTEL PER PROVINSI
+    # Pastikan df sudah di-load dan punya kolom 'Provinsi'
+    provinsi_counts = df['Provinsi'].value_counts().reset_index()
+    provinsi_counts.columns = ['Provinsi', 'Jumlah Hotel']
 
+    fig = px.pie(
+        provinsi_counts,
+        names='Provinsi',
+        values='Jumlah Hotel',
+        color_discrete_sequence=px.colors.sequential.Blues
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
+    # ...lanjutkan dengan slider card lokasi atau konten lain...
 with tab2:
     st.write("Silahkan ikuti langkah-langkah di bawah ini untuk menemukan hotel terbaik!")
     # ---------------------- LOAD DATASET -----------------------
@@ -329,18 +420,6 @@ with tab2:
         st.subheader("🔁 Rekomendasi Hotel Serupa (Content-Based)")
         st.dataframe(top_10_cb[['Hotel Name', 'City', 'Min', 'Max', 'list_fasilitas', 'similarity_score']])
 
-
-# ---------------------- LOAD DATA -----------------------
-@st.cache_data
-def load_data():
-    df = pd.read_csv('indonesia_hotels.csv')
-    df = df.dropna()
-    df['list_fasilitas'] = df['list_fasilitas'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
-    return df
-
-df = load_data()
-
-
 # ---------------------- FILTERING FUNCTION -----------------------
 def content_based_recommendation(df, hotel_name, top_n=5):
     mlb = MultiLabelBinarizer()
@@ -436,20 +515,24 @@ with tab4:
     """)
 
     # Judul bagian tim pengembang dengan center alignment
-    st.markdown('<h2 style="text-align: center;">Tim Pengembang</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; margin-bottom: 32px;">Tim Pengembang</h2>', unsafe_allow_html=True)
 
-    # Menggunakan tiga kolom agar konten di tengah
-    col_empty1, col1, col_empty2 = st.columns([2, 4, 2])
-
-    with col1:
-        # Dua kolom sejajar untuk gambar dan caption
-        img_col1, img_col2 = st.columns(2)
-
-        with img_col1:
-            st.image(" -2.jpg", width=200, caption="Nikita")
-
-        with img_col2:
-            st.image(" -3.jpg", width=200, caption="Najma")
+    # Foto tim pengembang sejajar di tengah
+    st.markdown("""
+    <div style="display: flex; justify-content: center; gap: 60px; margin-bottom: 32px;">
+        <div style="text-align: center;">
+            <img src="data:image/jpeg;base64,{}" width="200" style="border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);"/>
+            <div style="margin-top: 10px; font-size: 18px;">Nikita Farah A</div>
+        </div>
+        <div style="text-align: center;">
+            <img src="data:image/jpeg;base64,{}" width="200" style="border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);"/>
+            <div style="margin-top: 10px; font-size: 18px;">Najmatul Ilma M D</div>
+        </div>
+    </div>
+    """.format(
+        image_to_base64(" -2.jpg"),
+        image_to_base64(" -2.jpg")
+    ), unsafe_allow_html=True)
 
     # Garis pembatas dan pesan penutup
     st.write("---")
