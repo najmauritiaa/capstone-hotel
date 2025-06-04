@@ -530,8 +530,8 @@ with tab4:
         </div>
     </div>
     """.format(
-        image_to_base64("assets/me_time.jpg"),
-        image_to_base64("assets/me_time.jpg")
+        image_to_base64("assets/nikita.jpg"),
+        image_to_base64("assets/najma.jpg")
     ), unsafe_allow_html=True)
 
     # Garis pembatas dan pesan penutup
