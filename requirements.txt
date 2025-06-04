@@ -4,3 +4,5 @@ scikit-learn
 folium
 streamlit-folium
 numpy
+plotly
+Pillow
