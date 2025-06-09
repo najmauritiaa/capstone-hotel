@@ -149,8 +149,8 @@ with tab1:
     # Data kartu
     cards = [
         {"title": "Meditation", "description": "Temukan ketenangan dan fokus dengan sesi meditasi harian.", "image": "assets/me_time.jpg"},
-        {"title": "Socialized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": "assets/socialized.jpg"},
-        {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": "assets/meTime.jpg"},
+        {"title": "Socialized", "description": "Nikmati waktu bersama teman dan aktivitas sosial yang menyenangkan.", "image": "assets/socialized.jpeg"},
+        {"title": "Me Time", "description": "Waktu untuk diri sendiri, recharge dengan aktivitas favoritmu.", "image": "assets/meTime.jpeg"},
         {"title": "Adventure", "description": "Cari petualangan seru di alam terbuka atau tempat baru.", "image": "assets/adventure.jpg"},
         {"title": "Date", "description": "Rencanakan momen romantis bersama pasangan spesialmu.", "image": "assets/date.jpg"},
         {"title": "Sport", "description": "Tingkatkan energi dan kesehatan dengan aktivitas olahraga.", "image": "assets/sport.jpg"},
