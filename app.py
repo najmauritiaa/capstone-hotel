@@ -393,6 +393,8 @@ with tab2:
                 lambda x: count_matching_facilities(x, needed_keywords)
             )
             top_5 = indonesia_hotels.sort_values(by='matching_score', ascending=False).head(5)
+            top_5['Min'] = top_5['Min'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
+            top_5['Max'] = top_5['Max'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
             st.dataframe(top_5[['Hotel Name', 'City', 'Min', 'Max', 'list_fasilitas', 'matching_score']])
 
         # ============ Content-based Filtering ============
@@ -418,6 +420,8 @@ with tab2:
         top_10_cb['similarity_score'] = sim_scores[content_based_indices]
 
         st.subheader("🔁 Rekomendasi Hotel Serupa (Content-Based)")
+        top_5['Min'] = top_10_cb['Min'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
+        top_5['Max'] = top_10_cb['Max'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
         st.dataframe(top_10_cb[['Hotel Name', 'City', 'Min', 'Max', 'list_fasilitas', 'similarity_score']])
 
 # ---------------------- FILTERING FUNCTION -----------------------
