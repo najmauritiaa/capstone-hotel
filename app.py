@@ -385,6 +385,9 @@ with tab2:
                 lambda x: count_matching_facilities(x, needed_keywords)
             )
             top_5 = filtered_hotels.sort_values(by='matching_score', ascending=False).head(5)
+            top_5['Min'] = top_5['Min'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+            top_5['Max'] = top_5['Max'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+            
             st.subheader("🏨 Rekomendasi Hotel Berdasarkan Emosi & Budget (Top 5)")
             st.dataframe(top_5[['Hotel Name', 'City', 'Min', 'Max', 'list_fasilitas', 'matching_score']])
         else:
@@ -394,8 +397,8 @@ with tab2:
             )
             top_5 = indonesia_hotels.sort_values(by='matching_score', ascending=False).head(5)
             
-            top_5['Min'] = top_5['Min'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
-            top_5['Max'] = top_5['Max'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
+            top_5['Min'] = top_5['Min'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+            top_5['Max'] = top_5['Max'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
             
             st.dataframe(top_5[['Hotel Name', 'City', 'Min', 'Max', 'list_fasilitas', 'matching_score']])
 
@@ -421,8 +424,8 @@ with tab2:
         top_10_cb = indonesia_hotels.iloc[content_based_indices].copy()
         top_10_cb['similarity_score'] = sim_scores[content_based_indices]
 
-        top_10_cb['Min'] = top_10_cb['Min'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
-        top_10_cb['Max'] = top_10_cb['Max'].apply(lambda x: f"{x:,.0f}".replace(",", "."))
+        top_10_cb['Min'] = top_10_cb['Min'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+        top_10_cb['Max'] = top_10_cb['Max'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
 
         st.subheader("🔁 Rekomendasi Hotel Serupa (Content-Based)")
         st.dataframe(top_10_cb[['Hotel Name', 'City', 'Min', 'Max', 'list_fasilitas', 'similarity_score']])
@@ -484,10 +487,12 @@ with tab3:
         st.subheader("📋 Detail Hotel")
         if pd.notna(selected_hotel['Hotel Image']):
             st.image(selected_hotel['Hotel Image'], width=400)
+        harga_min = f"Rp {int(selected_hotel['Min']):,}".replace(",", ".")
+        harga_max = f"Rp {int(selected_hotel['Max']):,}".replace(",", ".")
         st.markdown(f"*Nama:* {selected_hotel['Hotel Name']}")
         st.markdown(f"*Lokasi:* {selected_hotel['City']}, {selected_hotel['Provinsi']}")
         st.markdown(f"*Rating:* {selected_hotel['Hotel Rating']}")
-        st.markdown(f"*Harga:* Rp {int(selected_hotel['Min'])} - Rp {int(selected_hotel['Max'])}")
+        st.markdown(f"*Harga:* {harga_min} - {harga_max}")
         st.markdown(f"*Fasilitas:* {', '.join(selected_hotel['list_fasilitas'])}")
 
         # ---------------------- Rekomendasi Serupa -----------------------
@@ -496,11 +501,13 @@ with tab3:
         rekomendasi = content_based_recommendation(df, selected_hotel_name)
 
         for _, row in rekomendasi.iterrows():
+            harga_min_r = f"Rp {int(row['Min']):,}".replace(",", ".")
+            harga_max_r = f"Rp {int(row['Max']):,}".replace(",", ".")
             st.markdown(f"### 🏨 {row['Hotel Name']}")
             if pd.notna(row['Hotel Image']):
                 st.image(row['Hotel Image'], width=400)
             st.write(f"📍 {row['City']} - {row['Provinsi']}")
-            st.write(f"💰 Rp {int(row['Min'])} - Rp {int(row['Max'])}")
+            st.write(f"💰 {harga_min_r} - {harga_max_r}")
             st.write(f"⭐ Rating: {row['Hotel Rating']}")
             st.write("*Fasilitas:*", ", ".join(row['list_fasilitas']))
             st.markdown("---")
