@@ -313,23 +313,15 @@ with tab2:
         answers[q] = st.selectbox(q, opts)
 
     st.subheader("Langkah 2: Masukkan Budget")
-    import re
-
-    def parse_rupiah(text):
-        try:
-            return int(re.sub(r"[^\d]", "", text))
-        except:
-            return 0
     col1, col2 = st.columns(2)
-    with col1:
-        min_input = st.text_input("💰 Budget Minimum", value="300.000")
-        budget_min = parse_rupiah(min_input)
-        st.caption(f"Input Anda: Rp {budget_min:,.0f}".replace(",", "."))
-    with col2:
-        max_input = st.text_input("💰 Budget Maksimum", value="800.000")
-        budget_max = parse_rupiah(max_input)
-        st.caption(f"Input Anda: Rp {budget_max:,.0f}".replace(",", "."))
 
+with col1:
+    budget_min = st.number_input("Budget Minimum (Rp)", value=300000, step=50000, format="%d")
+    st.caption(f"**→ Rp {budget_min:,.0f}**".replace(",", "."))
+
+with col2:
+    budget_max = st.number_input("Budget Maksimum (Rp)", value=800000, step=50000, format="%d")
+    st.caption(f"**→ Rp {budget_max:,.0f}**".replace(",", "."))
 
    # budget_min = st.number_input("Budget Minimum (Rp)", min_value=0, value=300000, step=50000)
    # budget_max = st.number_input("Budget Maksimum (Rp)", min_value=0, value=800000, step=50000)
