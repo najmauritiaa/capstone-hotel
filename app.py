@@ -320,17 +320,15 @@ with tab2:
             return int(re.sub(r"[^\d]", "", text))
             except:
                 return 0
-
-     col1, col2 = st.columns(2)
-with col1:
-    min_input = st.text_input("💰 Budget Minimum", value="300.000")
-    budget_min = parse_rupiah(min_input)
-    st.caption(f"Input Anda: Rp {budget_min:,.0f}".replace(",", "."))
-
-with col2:
-    max_input = st.text_input("💰 Budget Maksimum", value="800.000")
-    budget_max = parse_rupiah(max_input)
-    st.caption(f"Input Anda: Rp {budget_max:,.0f}".replace(",", "."))
+    col1, col2 = st.columns(2)
+    with col1:
+        min_input = st.text_input("💰 Budget Minimum", value="300.000")
+        budget_min = parse_rupiah(min_input)
+        st.caption(f"Input Anda: Rp {budget_min:,.0f}".replace(",", "."))
+    with col2:
+        max_input = st.text_input("💰 Budget Maksimum", value="800.000")
+        budget_max = parse_rupiah(max_input)
+        st.caption(f"Input Anda: Rp {budget_max:,.0f}".replace(",", "."))
 
 
    # budget_min = st.number_input("Budget Minimum (Rp)", min_value=0, value=300000, step=50000)
