@@ -318,8 +318,8 @@ with tab2:
     def parse_rupiah(text):
         try:
             return int(re.sub(r"[^\d]", "", text))
-            except:
-                return 0
+        except:
+            return 0
     col1, col2 = st.columns(2)
     with col1:
         min_input = st.text_input("💰 Budget Minimum", value="300.000")
