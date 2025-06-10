@@ -497,11 +497,11 @@ with tab3:
             st.image(selected_hotel['Hotel Image'], width=400)
         harga_min = f"Rp {int(selected_hotel['Min']):,}".replace(",", ".")
         harga_max = f"Rp {int(selected_hotel['Max']):,}".replace(",", ".")
-        st.markdown(f"*Nama:* {selected_hotel['Hotel Name']}")
-        st.markdown(f"*Lokasi:* {selected_hotel['City']}, {selected_hotel['Provinsi']}")
-        st.markdown(f"*Harga:* {harga_min} - {harga_max}")
-        st.markdown(f"*Rating:* {selected_hotel['Hotel Rating']}")
-        st.markdown(f"*Fasilitas:* {', '.join(selected_hotel['list_fasilitas'])}")
+        st.markdown(f"**Nama:** {selected_hotel['Hotel Name']}")
+        st.markdown(f"**Lokasi:** {selected_hotel['City']}, {selected_hotel['Provinsi']}")
+        st.markdown(f"**Harga:** {harga_min} - {harga_max}")
+        st.markdown(f"**Rating:** {selected_hotel['Hotel Rating']}")
+        st.markdown(f"**Fasilitas:** {', '.join(selected_hotel['list_fasilitas'])}")
 
         # ---------------------- Rekomendasi Serupa -----------------------
         st.subheader("Rekomendasi Hotel Serupa")
@@ -514,10 +514,10 @@ with tab3:
             st.markdown(f"### 🏨 {row['Hotel Name']}")
             if pd.notna(row['Hotel Image']):
                 st.image(row['Hotel Image'], width=400)
-            st.write(f"*Lokasi:* {row['City']} - {row['Provinsi']}")
-            st.write(f"*Harga:* {harga_min_r} - {harga_max_r}")
-            st.write(f"*Rating:* {row['Hotel Rating']}")
-            st.write("*Fasilitas:*", ", ".join(row['list_fasilitas']))
+            st.write(f"*Lokasi:** {row['City']} - {row['Provinsi']}")
+            st.write(f"**Harga:** {harga_min_r} - {harga_max_r}")
+            st.write(f"**Rating:** {row['Hotel Rating']}")
+            st.write("**Fasilitas:**", ", ".join(row['list_fasilitas']))
             st.markdown("---")
 with tab4:
     # Judul bagian
