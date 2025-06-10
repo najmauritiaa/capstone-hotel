@@ -504,7 +504,7 @@ with tab3:
         st.markdown(f"**Fasilitas:** {', '.join(selected_hotel['list_fasilitas'])}")
 
         # ---------------------- Rekomendasi Serupa -----------------------
-        st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
+        #st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
         st.markdown(
             """
             <div style="background-color: #e6f0ff; padding: 10px 15px; border-radius: 8px;">
