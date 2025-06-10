@@ -505,8 +505,15 @@ with tab3:
 
         # ---------------------- Rekomendasi Serupa -----------------------
         st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
-        st.subheader("Rekomendasi Hotel Serupa")
-        st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div style="background-color: #e6f0ff; padding: 10px 15px; border-radius: 8px;">
+            <h3 style="color: #003366; margin: 0;">🔁 Rekomendasi Hotel Serupa</h3>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        #st.subheader("Rekomendasi Hotel Serupa")
 
         rekomendasi = content_based_recommendation(df, selected_hotel_name)
 
