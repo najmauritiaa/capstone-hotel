@@ -504,7 +504,9 @@ with tab3:
         st.markdown(f"**Fasilitas:** {', '.join(selected_hotel['list_fasilitas'])}")
 
         # ---------------------- Rekomendasi Serupa -----------------------
+        st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
         st.subheader("Rekomendasi Hotel Serupa")
+        st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
 
         rekomendasi = content_based_recommendation(df, selected_hotel_name)
 
@@ -514,7 +516,7 @@ with tab3:
             st.markdown(f"### 🏨 {row['Hotel Name']}")
             if pd.notna(row['Hotel Image']):
                 st.image(row['Hotel Image'], width=400)
-            st.write(f"*Lokasi:** {row['City']} - {row['Provinsi']}")
+            st.write(f"**Lokasi:** {row['City']} - {row['Provinsi']}")
             st.write(f"**Harga:** {harga_min_r} - {harga_max_r}")
             st.write(f"**Rating:** {row['Hotel Rating']}")
             st.write("**Fasilitas:**", ", ".join(row['list_fasilitas']))
