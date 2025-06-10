@@ -508,7 +508,7 @@ with tab3:
         st.markdown(
             """
             <div style="background-color: #e6f0ff; padding: 10px 15px; border-radius: 8px;">
-            <h3 style="color: #003366; margin: 0;">🔁 Rekomendasi Hotel Serupa</h3>
+            <h3 style="color: #003366; margin: 0;">Rekomendasi Hotel Serupa</h3>
             </div>
             """,
             unsafe_allow_html=True
